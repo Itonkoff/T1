@@ -2,14 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Api.Contexts;
+using Api.Extensions;
+using Api.Models;
+using Api.Settings;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 
 namespace Api {
     public class Startup {
@@ -22,7 +30,17 @@ namespace Api {
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {
+        {            
+            services.Configure<JwtSettings>(Configuration.GetSection("Jwt"));
+            
+            var jwtSettings = Configuration.GetSection("Jwt").Get<JwtSettings>();
+            services.AddAuth(jwtSettings);
+            
+            services.AddDbContext<DatabaseContext>(o =>
+            {
+                o.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+            });
+            
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1",
@@ -30,7 +48,47 @@ namespace Api {
                         Title = "Smart card project API", 
                         Description = "This is the API for the Smart card Project" 
                     });
+                
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "JWT containing userid claim",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                });
+                
+                var security =
+                    new OpenApiSecurityRequirement
+                    {
+                        {
+                            new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Id = "Bearer",
+                                    Type = ReferenceType.SecurityScheme
+                                },
+                                UnresolvedReference = true
+                            },
+                            new List<string>()
+                        }
+                    };
+                
+                c.AddSecurityRequirement(security);
             });
+            
+            services.AddIdentity<User, Role>(options =>
+                {
+                    options.Password.RequiredLength = 8;
+                    options.Password.RequireNonAlphanumeric = true;
+                    options.Password.RequireUppercase = true;
+                    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1d);
+                })
+                .AddEntityFrameworkStores<DatabaseContext>()
+                .AddDefaultTokenProviders();
+
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            
             services.AddControllers();
         }
 
@@ -54,6 +112,8 @@ namespace Api {
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseAuth();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }

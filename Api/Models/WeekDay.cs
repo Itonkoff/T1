@@ -10,7 +10,7 @@ namespace Api.Models
             ModuleHasAcademicLevelHasWeekDay = new HashSet<ModuleHasAcademicLevelHasWeekDay>();
         }
 
-        public int IdweekDays { get; set; }
+        public int Id { get; set; }
         public string Value { get; set; }
 
         public virtual ICollection<ModuleHasAcademicLevelHasWeekDay> ModuleHasAcademicLevelHasWeekDay { get; set; }

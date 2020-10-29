@@ -10,7 +10,7 @@ namespace Api.Models
             Book = new HashSet<Book>();
         }
 
-        public int DaysAllowablecol { get; set; }
+        public int Id { get; set; }
         public int Value { get; set; }
 
         public virtual ICollection<Book> Book { get; set; }

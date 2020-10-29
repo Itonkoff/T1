@@ -10,7 +10,7 @@ namespace Api.Models
             BookHasStudent = new HashSet<BookHasStudent>();
         }
 
-        public int Idbook { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Version { get; set; }
         public string Author { get; set; }

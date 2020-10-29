@@ -11,7 +11,7 @@ namespace Api.Models
             ModuleHasProgram = new HashSet<ModuleHasProgram>();
         }
 
-        public int Idmodule { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
 

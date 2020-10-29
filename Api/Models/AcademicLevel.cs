@@ -11,7 +11,7 @@ namespace Api.Models
             Student = new HashSet<Student>();
         }
 
-        public int IdacademicLevel { get; set; }
+        public int Id { get; set; }
         public double Value { get; set; }
 
         public virtual ICollection<ModuleHasAcademicLevel> ModuleHasAcademicLevel { get; set; }

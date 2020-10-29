@@ -1,16 +1,16 @@
 ﻿using System;
+using Api.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Api.Models
-{
-    public partial class mtengureContext : DbContext
-    {
-        public mtengureContext()
+namespace Api.Contexts {
+    public partial class DatabaseContext : IdentityDbContext<User, Role, Guid> {
+        public DatabaseContext()
         {
         }
 
-        public mtengureContext(DbContextOptions<mtengureContext> options)
+        public DatabaseContext(DbContextOptions<DatabaseContext> options)
             : base(options)
         {
         }
@@ -26,31 +26,22 @@ namespace Api.Models
         public virtual DbSet<ModuleHasAcademicLevelHasWeekDay> ModuleHasAcademicLevelHasWeekDay { get; set; }
         public virtual DbSet<ModuleHasProgram> ModuleHasProgram { get; set; }
         public virtual DbSet<PenaltyRate> PenaltyRate { get; set; }
-        public virtual DbSet<Program> Program { get; set; }
+        public virtual DbSet<StudentProgram> Program { get; set; }
         public virtual DbSet<Student> Student { get; set; }
         public virtual DbSet<StudentHasModuleHasAcademicLevelHasWeekDay> StudentHasModuleHasAcademicLevelHasWeekDay { get; set; }
+        public virtual DbSet<User> User { get; set; }
         public virtual DbSet<WeekDay> WeekDay { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=DESKTOP-RMM46MK;Database=mtengure;Trusted_Connection=True;");
-            }
-        }
-
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+            
             modelBuilder.Entity<AcademicLevel>(entity =>
             {
-                entity.HasKey(e => e.IdacademicLevel)
-                    .HasName("PK_academic_level_idacademic_level");
-
                 entity.ToTable("academic_level", "mtengure");
 
-                entity.Property(e => e.IdacademicLevel)
-                    .HasColumnName("idacademic_level")
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
                     .ValueGeneratedNever();
 
                 entity.Property(e => e.Value).HasColumnName("value");
@@ -58,9 +49,6 @@ namespace Api.Models
 
             modelBuilder.Entity<Book>(entity =>
             {
-                entity.HasKey(e => e.Idbook)
-                    .HasName("PK_book_idbook");
-
                 entity.ToTable("book", "mtengure");
 
                 entity.HasIndex(e => e.DaysAllowable)
@@ -69,7 +57,7 @@ namespace Api.Models
                 entity.HasIndex(e => e.PenaltyRate)
                     .HasName("fk_book_penalty_rate1_idx");
 
-                entity.Property(e => e.Idbook).HasColumnName("idbook");
+                entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.Author)
                     .IsRequired()
@@ -105,7 +93,7 @@ namespace Api.Models
 
             modelBuilder.Entity<BookHasStudent>(entity =>
             {
-                entity.HasKey(e => new { e.Book, e.Student, e.Date })
+                entity.HasKey(e => new { e.Book, e.Student, e.DateBorrowed })
                     .HasName("PK_book_has_student_book");
 
                 entity.ToTable("book_has_student", "mtengure");
@@ -116,12 +104,15 @@ namespace Api.Models
                 entity.HasIndex(e => e.Student)
                     .HasName("fk_book_has_student_student1_idx");
 
+                entity.HasIndex(e => e.UserId)
+                    .HasName("fk_book_has_student_user1_idx");
+
                 entity.Property(e => e.Book).HasColumnName("book");
 
                 entity.Property(e => e.Student).HasColumnName("student");
 
-                entity.Property(e => e.Date)
-                    .HasColumnName("date")
+                entity.Property(e => e.DateBorrowed)
+                    .HasColumnName("date_borrowed")
                     .HasColumnType("date");
 
                 entity.Property(e => e.Paid).HasColumnName("paid");
@@ -139,6 +130,12 @@ namespace Api.Models
                     .HasForeignKey(d => d.Student)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("book_has_student$fk_book_has_student_student1");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.BookHasStudent)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("book_has_student$fk_book_has_student_user1");
             });
 
             modelBuilder.Entity<CanteenBalance>(entity =>
@@ -150,6 +147,9 @@ namespace Api.Models
 
                 entity.HasIndex(e => e.Student)
                     .HasName("fk_canteen_balance_student1_idx");
+
+                entity.HasIndex(e => e.UserId)
+                    .HasName("fk_canteen_balance_user1_idx");
 
                 entity.Property(e => e.Student)
                     .HasColumnName("student")
@@ -166,16 +166,18 @@ namespace Api.Models
                     .HasForeignKey<CanteenBalance>(d => d.Student)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("canteen_balance$fk_canteen_balance_student1");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.CanteenBalance)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("canteen_balance$fk_canteen_balance_user1");
             });
 
             modelBuilder.Entity<CanteenPriceList>(entity =>
             {
-                entity.HasKey(e => e.IdcanteenPriceList)
-                    .HasName("PK_canteen_price_list_idcanteen_price_list");
-
                 entity.ToTable("canteen_price_list", "mtengure");
 
-                entity.Property(e => e.IdcanteenPriceList).HasColumnName("idcanteen_price_list");
+                entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.Meal)
                     .IsRequired()
@@ -190,13 +192,10 @@ namespace Api.Models
 
             modelBuilder.Entity<DaysAllowable>(entity =>
             {
-                entity.HasKey(e => e.DaysAllowablecol)
-                    .HasName("PK_days_allowable_days_allowablecol");
-
                 entity.ToTable("days_allowable", "mtengure");
 
-                entity.Property(e => e.DaysAllowablecol)
-                    .HasColumnName("days_allowablecol")
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
                     .ValueGeneratedNever();
 
                 entity.Property(e => e.Value).HasColumnName("value");
@@ -204,12 +203,9 @@ namespace Api.Models
 
             modelBuilder.Entity<Module>(entity =>
             {
-                entity.HasKey(e => e.Idmodule)
-                    .HasName("PK_module_idmodule");
-
                 entity.ToTable("module", "mtengure");
 
-                entity.Property(e => e.Idmodule).HasColumnName("idmodule");
+                entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.Description).HasMaxLength(200);
 
@@ -285,54 +281,48 @@ namespace Api.Models
 
             modelBuilder.Entity<ModuleHasProgram>(entity =>
             {
-                entity.HasKey(e => new { e.ModuleIdmodule, e.ProgramIdprogram })
-                    .HasName("PK_module_has_program_module_idmodule");
+                entity.HasKey(e => new { e.Module, e.Program })
+                    .HasName("PK_module_has_program_module");
 
                 entity.ToTable("module_has_program", "mtengure");
 
-                entity.HasIndex(e => e.ModuleIdmodule)
+                entity.HasIndex(e => e.Module)
                     .HasName("fk_module_has_program_module1_idx");
 
-                entity.HasIndex(e => e.ProgramIdprogram)
+                entity.HasIndex(e => e.Program)
                     .HasName("fk_module_has_program_program1_idx");
 
-                entity.Property(e => e.ModuleIdmodule).HasColumnName("module_idmodule");
+                entity.Property(e => e.Module).HasColumnName("module");
 
-                entity.Property(e => e.ProgramIdprogram).HasColumnName("program_idprogram");
+                entity.Property(e => e.Program).HasColumnName("program");
 
-                entity.HasOne(d => d.ModuleIdmoduleNavigation)
+                entity.HasOne(d => d.ModuleNavigation)
                     .WithMany(p => p.ModuleHasProgram)
-                    .HasForeignKey(d => d.ModuleIdmodule)
+                    .HasForeignKey(d => d.Module)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("module_has_program$fk_module_has_program_module1");
 
-                entity.HasOne(d => d.ProgramIdprogramNavigation)
+                entity.HasOne(d => d.StudentProgramNavigation)
                     .WithMany(p => p.ModuleHasProgram)
-                    .HasForeignKey(d => d.ProgramIdprogram)
+                    .HasForeignKey(d => d.Program)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("module_has_program$fk_module_has_program_program1");
             });
 
             modelBuilder.Entity<PenaltyRate>(entity =>
             {
-                entity.HasKey(e => e.IdpenaltyRate)
-                    .HasName("PK_penalty_rate_idpenalty_rate");
-
                 entity.ToTable("penalty_rate", "mtengure");
 
-                entity.Property(e => e.IdpenaltyRate).HasColumnName("idpenalty_rate");
+                entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.Value).HasColumnName("value");
             });
 
-            modelBuilder.Entity<Program>(entity =>
+            modelBuilder.Entity<StudentProgram>(entity =>
             {
-                entity.HasKey(e => e.Idprogram)
-                    .HasName("PK_program_idprogram");
-
                 entity.ToTable("program", "mtengure");
 
-                entity.Property(e => e.Idprogram).HasColumnName("idprogram");
+                entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.Description)
                     .HasColumnName("description")
@@ -346,9 +336,6 @@ namespace Api.Models
 
             modelBuilder.Entity<Student>(entity =>
             {
-                entity.HasKey(e => e.Idstudent)
-                    .HasName("PK_student_idstudent");
-
                 entity.ToTable("student", "mtengure");
 
                 entity.HasIndex(e => e.AcademicLevel)
@@ -357,7 +344,10 @@ namespace Api.Models
                 entity.HasIndex(e => e.Program)
                     .HasName("fk_student_program1_idx");
 
-                entity.Property(e => e.Idstudent).HasColumnName("idstudent");
+                entity.HasIndex(e => e.UserId)
+                    .HasName("fk_student_user1_idx");
+
+                entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.AcademicLevel).HasColumnName("academic_level");
 
@@ -373,27 +363,33 @@ namespace Api.Models
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("student$fk_student_academic_level1");
 
-                entity.HasOne(d => d.ProgramNavigation)
+                entity.HasOne(d => d.StudentProgramNavigation)
                     .WithMany(p => p.Student)
                     .HasForeignKey(d => d.Program)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("student$fk_student_program1");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Student)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("student$fk_student_user1");
             });
 
             modelBuilder.Entity<StudentHasModuleHasAcademicLevelHasWeekDay>(entity =>
             {
-                entity.HasKey(e => new { e.StudentIdstudent, e.Module, e.AcademicLevel, e.WeekDay, e.Date })
-                    .HasName("PK_student_has_module_has_academic_level_has_week_day_student_idstudent");
+                entity.HasKey(e => new { e.Student, e.Module, e.AcademicLevel, e.WeekDay, e.Date })
+                    .HasName("PK_student_has_module_has_academic_level_has_week_day_student");
 
                 entity.ToTable("student_has_module_has_academic_level_has_week_day", "mtengure");
 
-                entity.HasIndex(e => e.StudentIdstudent)
+                entity.HasIndex(e => e.Student)
                     .HasName("fk_student_has_module_has_academic_level_has_week_day_stude_idx");
 
                 entity.HasIndex(e => new { e.Module, e.AcademicLevel, e.WeekDay })
                     .HasName("fk_student_has_module_has_academic_level_has_week_day_modul_idx");
 
-                entity.Property(e => e.StudentIdstudent).HasColumnName("student_idstudent");
+                entity.Property(e => e.Student).HasColumnName("student");
 
                 entity.Property(e => e.Module).HasColumnName("module");
 
@@ -405,9 +401,9 @@ namespace Api.Models
                     .HasColumnName("date")
                     .HasColumnType("date");
 
-                entity.HasOne(d => d.StudentIdstudentNavigation)
+                entity.HasOne(d => d.StudentNavigation)
                     .WithMany(p => p.StudentHasModuleHasAcademicLevelHasWeekDay)
-                    .HasForeignKey(d => d.StudentIdstudent)
+                    .HasForeignKey(d => d.Student)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("student_has_module_has_academic_level_has_week_day$fk_student_has_module_has_academic_level_has_week_day_student1");
 
@@ -420,12 +416,9 @@ namespace Api.Models
 
             modelBuilder.Entity<WeekDay>(entity =>
             {
-                entity.HasKey(e => e.IdweekDays)
-                    .HasName("PK_week_day_idweek_days");
-
                 entity.ToTable("week_day", "mtengure");
 
-                entity.Property(e => e.IdweekDays).HasColumnName("idweek_days");
+                entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.Value)
                     .IsRequired()

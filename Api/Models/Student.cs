@@ -11,14 +11,15 @@ namespace Api.Models
             StudentHasModuleHasAcademicLevelHasWeekDay = new HashSet<StudentHasModuleHasAcademicLevelHasWeekDay>();
         }
 
-        public int Idstudent { get; set; }
+        public int Id { get; set; }
         public int AcademicLevel { get; set; }
         public int Program { get; set; }
         public short Registered { get; set; }
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
 
         public virtual AcademicLevel AcademicLevelNavigation { get; set; }
-        public virtual Program ProgramNavigation { get; set; }
+        public virtual StudentProgram StudentProgramNavigation { get; set; }
+        public virtual User User { get; set; }
         public virtual CanteenBalance CanteenBalance { get; set; }
         public virtual ICollection<BookHasStudent> BookHasStudent { get; set; }
         public virtual ICollection<StudentHasModuleHasAcademicLevelHasWeekDay> StudentHasModuleHasAcademicLevelHasWeekDay { get; set; }

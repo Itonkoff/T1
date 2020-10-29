@@ -3,15 +3,15 @@ using System.Collections.Generic;
 
 namespace Api.Models
 {
-    public partial class Program
+    public partial class StudentProgram
     {
-        public Program()
+        public StudentProgram()
         {
             ModuleHasProgram = new HashSet<ModuleHasProgram>();
             Student = new HashSet<Student>();
         }
 
-        public int Idprogram { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
 

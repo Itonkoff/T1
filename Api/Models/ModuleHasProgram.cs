@@ -5,10 +5,10 @@ namespace Api.Models
 {
     public partial class ModuleHasProgram
     {
-        public int ModuleIdmodule { get; set; }
-        public int ProgramIdprogram { get; set; }
+        public int Module { get; set; }
+        public int Program { get; set; }
 
-        public virtual Module ModuleIdmoduleNavigation { get; set; }
-        public virtual Program ProgramIdprogramNavigation { get; set; }
+        public virtual Module ModuleNavigation { get; set; }
+        public virtual StudentProgram StudentProgramNavigation { get; set; }
     }
 }
