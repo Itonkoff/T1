@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Api.Contexts;
 using Api.Extensions;
 using Api.Models;
+using Api.Repositories.Base;
+using Api.Services.Students;
 using Api.Settings;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
@@ -30,7 +32,8 @@ namespace Api {
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {            
+        {    
+            
             services.Configure<JwtSettings>(Configuration.GetSection("Jwt"));
             
             var jwtSettings = Configuration.GetSection("Jwt").Get<JwtSettings>();
@@ -87,6 +90,10 @@ namespace Api {
                 .AddEntityFrameworkStores<DatabaseContext>()
                 .AddDefaultTokenProviders();
 
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            
+            services.AddTransient<IStudentService, StudentService>();
+            
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             
             services.AddControllers();

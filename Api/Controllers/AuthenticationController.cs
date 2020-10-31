@@ -18,19 +18,19 @@ using Microsoft.IdentityModel.Tokens;
 namespace Api.Controllers {
     [AllowAnonymous]
     [Route("api/[controller]")]
+    [ApiController]
     public class AuthenticationController : Controller {
-        
         private IMapper _mapper;
         private UserManager<User> _userManager;
         private RoleManager<Role> _roleManager;
         private readonly JwtSettings _jwtSettings;
 
         public AuthenticationController(
-            IMapper mapper, 
+            IMapper mapper,
             UserManager<User> userManager,
             RoleManager<Role> roleManager,
             IOptionsSnapshot<JwtSettings> jwtSettings
-            )
+        )
         {
             _jwtSettings = jwtSettings.Value;
             _roleManager = roleManager;
@@ -52,7 +52,7 @@ namespace Api.Controllers {
 
             return Problem(userCreateResult.Errors.First().Description, null, 500);
         }
-        
+
         [HttpPost("SignIn")]
         public async Task<IActionResult> SignIn(LoginDto userLoginResource)
         {
@@ -73,11 +73,12 @@ namespace Api.Controllers {
 
             return BadRequest("Email or password incorrect.");
         }
-        
+
+        [Authorize(Roles = "Sis_admin")]
         [HttpPost("Roles")]
         public async Task<IActionResult> CreateRole(string roleName)
         {
-            if(string.IsNullOrWhiteSpace(roleName))
+            if (string.IsNullOrWhiteSpace(roleName))
             {
                 return BadRequest("Role name should be provided.");
             }
@@ -96,7 +97,7 @@ namespace Api.Controllers {
 
             return Problem(roleResult.Errors.First().Description, null, 500);
         }
-        
+
         [Authorize]
         [HttpPost("User/Role")]
         public async Task<IActionResult> AddUserToRole(string userEmail, string roleName)
@@ -112,13 +113,13 @@ namespace Api.Controllers {
 
             return Problem(result.Errors.First().Description, null, 500);
         }
-        
+
         private string GenerateJwt(User user, IList<string> roles)
         {
+            //TODO: Get User First Name and Last Name and add as third claim
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             };
@@ -134,8 +135,8 @@ namespace Api.Controllers {
                 issuer: _jwtSettings.Issuer,
                 audience: _jwtSettings.Issuer,
                 claims,
-                expires : expires,
-                signingCredentials : creds
+                expires: expires,
+                signingCredentials: creds
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);

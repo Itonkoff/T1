@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using Api.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -35,7 +36,7 @@ namespace Api.Contexts {
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            
+
             modelBuilder.Entity<AcademicLevel>(entity =>
             {
                 entity.ToTable("academic_level", "mtengure");
@@ -104,8 +105,7 @@ namespace Api.Contexts {
                 entity.HasIndex(e => e.Student)
                     .HasName("fk_book_has_student_student1_idx");
 
-                entity.HasIndex(e => e.UserId)
-                    .HasName("fk_book_has_student_user1_idx");
+               
 
                 entity.Property(e => e.Book).HasColumnName("book");
 
@@ -117,7 +117,7 @@ namespace Api.Contexts {
 
                 entity.Property(e => e.Paid).HasColumnName("paid");
 
-                entity.Property(e => e.UserId).HasColumnName("user_id");
+               
 
                 entity.HasOne(d => d.BookNavigation)
                     .WithMany(p => p.BookHasStudent)
@@ -131,11 +131,7 @@ namespace Api.Contexts {
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("book_has_student$fk_book_has_student_student1");
 
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.BookHasStudent)
-                    .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("book_has_student$fk_book_has_student_user1");
+               
             });
 
             modelBuilder.Entity<CanteenBalance>(entity =>
@@ -148,8 +144,7 @@ namespace Api.Contexts {
                 entity.HasIndex(e => e.Student)
                     .HasName("fk_canteen_balance_student1_idx");
 
-                entity.HasIndex(e => e.UserId)
-                    .HasName("fk_canteen_balance_user1_idx");
+                
 
                 entity.Property(e => e.Student)
                     .HasColumnName("student")
@@ -159,7 +154,7 @@ namespace Api.Contexts {
 
                 entity.Property(e => e.Dr).HasColumnName("dr");
 
-                entity.Property(e => e.UserId).HasColumnName("user_id");
+               
 
                 entity.HasOne(d => d.StudentNavigation)
                     .WithOne(p => p.CanteenBalance)
@@ -167,10 +162,7 @@ namespace Api.Contexts {
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("canteen_balance$fk_canteen_balance_student1");
 
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.CanteenBalance)
-                    .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("canteen_balance$fk_canteen_balance_user1");
+               
             });
 
             modelBuilder.Entity<CanteenPriceList>(entity =>
