@@ -28,11 +28,18 @@ namespace Api.Contexts {
         public virtual DbSet<ModuleHasProgram> ModuleHasProgram { get; set; }
         public virtual DbSet<PenaltyRate> PenaltyRate { get; set; }
         public virtual DbSet<StudentProgram> Program { get; set; }
+        public virtual DbSet<Staff> Staff { get; set; }
         public virtual DbSet<Student> Student { get; set; }
-        public virtual DbSet<StudentHasModuleHasAcademicLevelHasWeekDay> StudentHasModuleHasAcademicLevelHasWeekDay { get; set; }
+
+        public virtual DbSet<StudentHasModuleHasAcademicLevelHasWeekDay> StudentHasModuleHasAcademicLevelHasWeekDay
+        {
+            get;
+            set;
+        }
+
         public virtual DbSet<User> User { get; set; }
         public virtual DbSet<WeekDay> WeekDay { get; set; }
-        
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -94,7 +101,7 @@ namespace Api.Contexts {
 
             modelBuilder.Entity<BookHasStudent>(entity =>
             {
-                entity.HasKey(e => new { e.Book, e.Student, e.DateBorrowed })
+                entity.HasKey(e => new {e.Book, e.Student, e.DateBorrowed})
                     .HasName("PK_book_has_student_book");
 
                 entity.ToTable("book_has_student", "mtengure");
@@ -105,7 +112,6 @@ namespace Api.Contexts {
                 entity.HasIndex(e => e.Student)
                     .HasName("fk_book_has_student_student1_idx");
 
-               
 
                 entity.Property(e => e.Book).HasColumnName("book");
 
@@ -117,7 +123,6 @@ namespace Api.Contexts {
 
                 entity.Property(e => e.Paid).HasColumnName("paid");
 
-               
 
                 entity.HasOne(d => d.BookNavigation)
                     .WithMany(p => p.BookHasStudent)
@@ -130,8 +135,6 @@ namespace Api.Contexts {
                     .HasForeignKey(d => d.Student)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("book_has_student$fk_book_has_student_student1");
-
-               
             });
 
             modelBuilder.Entity<CanteenBalance>(entity =>
@@ -144,7 +147,6 @@ namespace Api.Contexts {
                 entity.HasIndex(e => e.Student)
                     .HasName("fk_canteen_balance_student1_idx");
 
-                
 
                 entity.Property(e => e.Student)
                     .HasColumnName("student")
@@ -154,15 +156,12 @@ namespace Api.Contexts {
 
                 entity.Property(e => e.Dr).HasColumnName("dr");
 
-               
 
                 entity.HasOne(d => d.StudentNavigation)
                     .WithOne(p => p.CanteenBalance)
                     .HasForeignKey<CanteenBalance>(d => d.Student)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("canteen_balance$fk_canteen_balance_student1");
-
-               
             });
 
             modelBuilder.Entity<CanteenPriceList>(entity =>
@@ -209,7 +208,7 @@ namespace Api.Contexts {
 
             modelBuilder.Entity<ModuleHasAcademicLevel>(entity =>
             {
-                entity.HasKey(e => new { e.Module, e.AcademicLevel })
+                entity.HasKey(e => new {e.Module, e.AcademicLevel})
                     .HasName("PK_module_has_academic_level_module");
 
                 entity.ToTable("module_has_academic_level", "mtengure");
@@ -239,7 +238,7 @@ namespace Api.Contexts {
 
             modelBuilder.Entity<ModuleHasAcademicLevelHasWeekDay>(entity =>
             {
-                entity.HasKey(e => new { e.Module, e.AcademicLevel, e.WeekDay })
+                entity.HasKey(e => new {e.Module, e.AcademicLevel, e.WeekDay})
                     .HasName("PK_module_has_academic_level_has_week_day_module");
 
                 entity.ToTable("module_has_academic_level_has_week_day", "mtengure");
@@ -247,7 +246,7 @@ namespace Api.Contexts {
                 entity.HasIndex(e => e.WeekDay)
                     .HasName("fk_module_has_academic_level_has_week_day_week_day1_idx");
 
-                entity.HasIndex(e => new { e.Module, e.AcademicLevel })
+                entity.HasIndex(e => new {e.Module, e.AcademicLevel})
                     .HasName("fk_module_has_academic_level_has_week_day_module_has_academ_idx");
 
                 entity.Property(e => e.Module).HasColumnName("module");
@@ -262,18 +261,20 @@ namespace Api.Contexts {
                     .WithMany(p => p.ModuleHasAcademicLevelHasWeekDay)
                     .HasForeignKey(d => d.WeekDay)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("module_has_academic_level_has_week_day$fk_module_has_academic_level_has_week_day_week_day1");
+                    .HasConstraintName(
+                        "module_has_academic_level_has_week_day$fk_module_has_academic_level_has_week_day_week_day1");
 
                 entity.HasOne(d => d.ModuleHasAcademicLevel)
                     .WithMany(p => p.ModuleHasAcademicLevelHasWeekDay)
-                    .HasForeignKey(d => new { d.Module, d.AcademicLevel })
+                    .HasForeignKey(d => new {d.Module, d.AcademicLevel})
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("module_has_academic_level_has_week_day$fk_module_has_academic_level_has_week_day_module_has_academic1");
+                    .HasConstraintName(
+                        "module_has_academic_level_has_week_day$fk_module_has_academic_level_has_week_day_module_has_academic1");
             });
 
             modelBuilder.Entity<ModuleHasProgram>(entity =>
             {
-                entity.HasKey(e => new { e.Module, e.Program })
+                entity.HasKey(e => new {e.Module, e.Program})
                     .HasName("PK_module_has_program_module");
 
                 entity.ToTable("module_has_program", "mtengure");
@@ -325,6 +326,24 @@ namespace Api.Contexts {
                     .HasColumnName("name")
                     .HasMaxLength(200);
             });
+            
+            modelBuilder.Entity<Staff>(entity =>
+            {
+                entity.ToTable("staff", "mtengure");                
+
+                entity.HasIndex(e => e.UserId)
+                    .HasName("fk_student_user1_idx");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                
+                entity.Property(e => e.UserId).HasColumnName("user_id");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Staff)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("staff$fk_student_user1");
+            });
 
             modelBuilder.Entity<Student>(entity =>
             {
@@ -370,7 +389,7 @@ namespace Api.Contexts {
 
             modelBuilder.Entity<StudentHasModuleHasAcademicLevelHasWeekDay>(entity =>
             {
-                entity.HasKey(e => new { e.Student, e.Module, e.AcademicLevel, e.WeekDay, e.Date })
+                entity.HasKey(e => new {e.Student, e.Module, e.AcademicLevel, e.WeekDay, e.Date})
                     .HasName("PK_student_has_module_has_academic_level_has_week_day_student");
 
                 entity.ToTable("student_has_module_has_academic_level_has_week_day", "mtengure");
@@ -378,7 +397,7 @@ namespace Api.Contexts {
                 entity.HasIndex(e => e.Student)
                     .HasName("fk_student_has_module_has_academic_level_has_week_day_stude_idx");
 
-                entity.HasIndex(e => new { e.Module, e.AcademicLevel, e.WeekDay })
+                entity.HasIndex(e => new {e.Module, e.AcademicLevel, e.WeekDay})
                     .HasName("fk_student_has_module_has_academic_level_has_week_day_modul_idx");
 
                 entity.Property(e => e.Student).HasColumnName("student");
@@ -397,13 +416,15 @@ namespace Api.Contexts {
                     .WithMany(p => p.StudentHasModuleHasAcademicLevelHasWeekDay)
                     .HasForeignKey(d => d.Student)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("student_has_module_has_academic_level_has_week_day$fk_student_has_module_has_academic_level_has_week_day_student1");
+                    .HasConstraintName(
+                        "student_has_module_has_academic_level_has_week_day$fk_student_has_module_has_academic_level_has_week_day_student1");
 
                 entity.HasOne(d => d.ModuleHasAcademicLevelHasWeekDay)
                     .WithMany(p => p.StudentHasModuleHasAcademicLevelHasWeekDay)
-                    .HasForeignKey(d => new { d.Module, d.AcademicLevel, d.WeekDay })
+                    .HasForeignKey(d => new {d.Module, d.AcademicLevel, d.WeekDay})
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("student_has_module_has_academic_level_has_week_day$fk_student_has_module_has_academic_level_has_week_day_module_1");
+                    .HasConstraintName(
+                        "student_has_module_has_academic_level_has_week_day$fk_student_has_module_has_academic_level_has_week_day_module_1");
             });
 
             modelBuilder.Entity<WeekDay>(entity =>

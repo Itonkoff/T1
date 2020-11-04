@@ -23,32 +23,10 @@ namespace Api.Services.Students {
             return await _unitOfWork.Students.GetByIdAsync(id);
         }
 
-        public async Task<Student> CreateStudent(Student newStudent)
+        public async Task<int> UpdateStudentUserId(Student studentToBeUpdated, Guid userId)
         {
-            newStudent.Registered = false;
-            newStudent.RegNumber = Guid.NewGuid();
-            await _unitOfWork.Students.AddAsync(newStudent);
-            await _unitOfWork.CommitAsync();
-            return newStudent;
-        }
-
-        public async Task UpdateStudent(Student studentToBeUpdated, Student student)
-        {
-            //TODO: to handle changing of program and academic level
-            studentToBeUpdated.FirstName = student.FirstName;
-            studentToBeUpdated.LastName = student.LastName;
-            studentToBeUpdated.NationalId = student.NationalId;
-            studentToBeUpdated.PhysicalAddress = student.PhysicalAddress;
-
-            if (!studentToBeUpdated.Registered && student.Registered)
-                studentToBeUpdated.Registered = true;
-            await _unitOfWork.CommitAsync();
-        }
-
-        public async Task DeleteStudent(Student student)
-        {
-            _unitOfWork.Students.Remove(student);
-            await _unitOfWork.CommitAsync();
+            studentToBeUpdated.UserId = userId;
+            return await _unitOfWork.CommitAsync();
         }
     }
 }

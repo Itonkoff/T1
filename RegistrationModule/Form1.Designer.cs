@@ -56,6 +56,7 @@
             this.allToolStripMenuItem.Name = "allToolStripMenuItem";
             this.allToolStripMenuItem.Size = new System.Drawing.Size(220, 26);
             this.allToolStripMenuItem.Text = "Manage Information";
+            this.allToolStripMenuItem.Click += new System.EventHandler(this.allToolStripMenuItem_Click);
             // 
             // Form1
             // 

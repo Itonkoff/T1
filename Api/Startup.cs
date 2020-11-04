@@ -6,6 +6,8 @@ using Api.Contexts;
 using Api.Extensions;
 using Api.Models;
 using Api.Repositories.Base;
+using Api.Repositories.Base.StaffRepository;
+using Api.Services.Staff;
 using Api.Services.Students;
 using Api.Settings;
 using AutoMapper;
@@ -93,6 +95,8 @@ namespace Api {
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             
             services.AddTransient<IStudentService, StudentService>();
+            
+            services.AddTransient<IStaffService, StaffService>();
             
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             

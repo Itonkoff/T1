@@ -316,6 +316,32 @@ namespace Api.Migrations
                     b.ToTable("AspNetRoles");
                 });
 
+            modelBuilder.Entity("Api.Models.Staff", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("id")
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnName("user_id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .HasName("fk_student_user1_idx");
+
+                    b.ToTable("staff","mtengure");
+                });
+
             modelBuilder.Entity("Api.Models.Student", b =>
                 {
                     b.Property<int>("Id")
@@ -694,6 +720,15 @@ namespace Api.Migrations
                         .WithMany("ModuleHasProgram")
                         .HasForeignKey("Program")
                         .HasConstraintName("module_has_program$fk_module_has_program_program1")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Api.Models.Staff", b =>
+                {
+                    b.HasOne("Api.Models.User", "User")
+                        .WithMany("Staff")
+                        .HasForeignKey("UserId")
+                        .HasConstraintName("staff$fk_student_user1")
                         .IsRequired();
                 });
 

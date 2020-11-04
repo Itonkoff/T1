@@ -9,6 +9,7 @@ namespace Api.Models {
             Student = new HashSet<Student>();
         } 
         public virtual ICollection<Student> Student { get; set; }
+        public virtual ICollection<Staff> Staff { get; set; }
     }
 }
 
