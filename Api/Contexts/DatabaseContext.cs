@@ -112,6 +112,13 @@ namespace Api.Contexts {
                 entity.HasIndex(e => e.Student)
                     .HasName("fk_book_has_student_student1_idx");
 
+                entity.Property(e => e.Returned)
+                    .HasColumnName("returned")
+                    .HasDefaultValue(false);
+
+                entity.Property(e => e.Paid)
+                    .HasColumnName("paid-")
+                    .HasDefaultValue(false);
 
                 entity.Property(e => e.Book).HasColumnName("book");
 
@@ -139,18 +146,18 @@ namespace Api.Contexts {
 
             modelBuilder.Entity<CanteenBalance>(entity =>
             {
-                entity.HasKey(e => e.Student)
-                    .HasName("PK_canteen_balance_student");
-
                 entity.ToTable("canteen_balance", "mtengure");
 
                 entity.HasIndex(e => e.Student)
                     .HasName("fk_canteen_balance_student1_idx");
 
+                entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.Student)
                     .HasColumnName("student")
                     .ValueGeneratedNever();
+
+                entity.Property(e => e.Date).HasColumnName("date");
 
                 entity.Property(e => e.Cr).HasColumnName("cr");
 
@@ -158,8 +165,8 @@ namespace Api.Contexts {
 
 
                 entity.HasOne(d => d.StudentNavigation)
-                    .WithOne(p => p.CanteenBalance)
-                    .HasForeignKey<CanteenBalance>(d => d.Student)
+                    .WithMany(p => p.CanteenBalance)
+                    .HasForeignKey(d => d.Student)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("canteen_balance$fk_canteen_balance_student1");
             });
@@ -326,16 +333,16 @@ namespace Api.Contexts {
                     .HasColumnName("name")
                     .HasMaxLength(200);
             });
-            
+
             modelBuilder.Entity<Staff>(entity =>
             {
-                entity.ToTable("staff", "mtengure");                
+                entity.ToTable("staff", "mtengure");
 
                 entity.HasIndex(e => e.UserId)
                     .HasName("fk_student_user1_idx");
 
                 entity.Property(e => e.Id).HasColumnName("id");
-                
+
                 entity.Property(e => e.UserId).HasColumnName("user_id");
 
                 entity.HasOne(d => d.User)

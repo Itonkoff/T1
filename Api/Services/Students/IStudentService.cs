@@ -8,5 +8,6 @@ namespace Api.Services.Students {
         Task<IEnumerable<Student>> GetAllStudents();
         Task<Student> GetStudentById(int id);        
         Task<int> UpdateStudentUserId(Student studentToBeUpdated, Guid UserId);
+        Task<Student> GetStudentByRefAsync(Guid borrowBookStudent);
     }
 }

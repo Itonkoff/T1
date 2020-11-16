@@ -28,5 +28,10 @@ namespace Api.Services.Students {
             studentToBeUpdated.UserId = userId;
             return await _unitOfWork.CommitAsync();
         }
+
+        public async Task<Student> GetStudentByRefAsync(Guid borrowBookStudent)
+        {
+            return await _unitOfWork.Students.GetStudentByRefAsync(borrowBookStudent);
+        }
     }
 }

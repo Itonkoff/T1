@@ -89,7 +89,7 @@ namespace Api.Migrations
                         .HasColumnName("book")
                         .HasColumnType("int");
 
-                    b.Property<int>("Student")
+                    b.Property<int>("StudentId")
                         .HasColumnName("student")
                         .HasColumnType("int");
 
@@ -101,13 +101,13 @@ namespace Api.Migrations
                         .HasColumnName("paid")
                         .HasColumnType("smallint");
 
-                    b.HasKey("Book", "Student", "DateBorrowed")
+                    b.HasKey("Book", "StudentId", "DateBorrowed")
                         .HasName("PK_book_has_student_book");
 
                     b.HasIndex("Book")
                         .HasName("fk_book_has_student_book1_idx");
 
-                    b.HasIndex("Student")
+                    b.HasIndex("StudentId")
                         .HasName("fk_book_has_student_student1_idx");
 
                     b.ToTable("book_has_student","mtengure");
@@ -115,7 +115,7 @@ namespace Api.Migrations
 
             modelBuilder.Entity("Api.Models.CanteenBalance", b =>
                 {
-                    b.Property<int>("Student")
+                    b.Property<int>("StudentId")
                         .HasColumnName("student")
                         .HasColumnType("int");
 
@@ -127,10 +127,10 @@ namespace Api.Migrations
                         .HasColumnName("dr")
                         .HasColumnType("float");
 
-                    b.HasKey("Student")
+                    b.HasKey("StudentId")
                         .HasName("PK_canteen_balance_student");
 
-                    b.HasIndex("Student")
+                    b.HasIndex("StudentId")
                         .HasName("fk_canteen_balance_student1_idx");
 
                     b.ToTable("canteen_balance","mtengure");
@@ -318,7 +318,7 @@ namespace Api.Migrations
                     b.ToTable("AspNetRoles");
                 });
 
-            modelBuilder.Entity("Api.Models.Student", b =>
+            modelBuilder.Entity("Api.Models.StudentId", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -373,7 +373,7 @@ namespace Api.Migrations
 
             modelBuilder.Entity("Api.Models.StudentHasModuleHasAcademicLevelHasWeekDay", b =>
                 {
-                    b.Property<int>("Student")
+                    b.Property<int>("StudentId")
                         .HasColumnName("student")
                         .HasColumnType("int");
 
@@ -393,10 +393,10 @@ namespace Api.Migrations
                         .HasColumnName("date")
                         .HasColumnType("date");
 
-                    b.HasKey("Student", "Module", "AcademicLevel", "WeekDay", "Date")
+                    b.HasKey("StudentId", "Module", "AcademicLevel", "WeekDay", "Date")
                         .HasName("PK_student_has_module_has_academic_level_has_week_day_student");
 
-                    b.HasIndex("Student")
+                    b.HasIndex("StudentId")
                         .HasName("fk_student_has_module_has_academic_level_has_week_day_stude_idx");
 
                     b.HasIndex("Module", "AcademicLevel", "WeekDay")
@@ -638,18 +638,18 @@ namespace Api.Migrations
                         .HasConstraintName("book_has_student$fk_book_has_student_book1")
                         .IsRequired();
 
-                    b.HasOne("Api.Models.Student", "StudentNavigation")
+                    b.HasOne("Api.Models.StudentId", "StudentNavigation")
                         .WithMany("BookHasStudent")
-                        .HasForeignKey("Student")
+                        .HasForeignKey("StudentId")
                         .HasConstraintName("book_has_student$fk_book_has_student_student1")
                         .IsRequired();
                 });
 
             modelBuilder.Entity("Api.Models.CanteenBalance", b =>
                 {
-                    b.HasOne("Api.Models.Student", "StudentNavigation")
+                    b.HasOne("Api.Models.StudentId", "StudentNavigation")
                         .WithOne("CanteenBalance")
-                        .HasForeignKey("Api.Models.CanteenBalance", "Student")
+                        .HasForeignKey("Api.Models.CanteenBalance", "StudentId")
                         .HasConstraintName("canteen_balance$fk_canteen_balance_student1")
                         .IsRequired();
                 });
@@ -699,31 +699,31 @@ namespace Api.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Api.Models.Student", b =>
+            modelBuilder.Entity("Api.Models.StudentId", b =>
                 {
                     b.HasOne("Api.Models.AcademicLevel", "AcademicLevelNavigation")
-                        .WithMany("Student")
+                        .WithMany("StudentId")
                         .HasForeignKey("AcademicLevel")
                         .HasConstraintName("student$fk_student_academic_level1")
                         .IsRequired();
 
                     b.HasOne("Api.Models.StudentProgram", "StudentProgramNavigation")
-                        .WithMany("Student")
+                        .WithMany("StudentId")
                         .HasForeignKey("Program")
                         .HasConstraintName("student$fk_student_program1")
                         .IsRequired();
 
                     b.HasOne("Api.Models.User", "User")
-                        .WithMany("Student")
+                        .WithMany("StudentId")
                         .HasForeignKey("UserId")
                         .HasConstraintName("student$fk_student_user1");
                 });
 
             modelBuilder.Entity("Api.Models.StudentHasModuleHasAcademicLevelHasWeekDay", b =>
                 {
-                    b.HasOne("Api.Models.Student", "StudentNavigation")
+                    b.HasOne("Api.Models.StudentId", "StudentNavigation")
                         .WithMany("StudentHasModuleHasAcademicLevelHasWeekDay")
-                        .HasForeignKey("Student")
+                        .HasForeignKey("StudentId")
                         .HasConstraintName("student_has_module_has_academic_level_has_week_day$fk_student_has_module_has_academic_level_has_week_day_student1")
                         .IsRequired();
 

@@ -7,6 +7,9 @@ using Api.Extensions;
 using Api.Models;
 using Api.Repositories.Base;
 using Api.Repositories.Base.StaffRepository;
+using Api.Repositories.StudentRepository;
+using Api.Services.CanteenService;
+using Api.Services.LibraryService;
 using Api.Services.Staff;
 using Api.Services.Students;
 using Api.Settings;
@@ -91,12 +94,19 @@ namespace Api {
                 })
                 .AddEntityFrameworkStores<DatabaseContext>()
                 .AddDefaultTokenProviders();
+            
+            // Custom Services
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             
             services.AddTransient<IStudentService, StudentService>();
             
             services.AddTransient<IStaffService, StaffService>();
+            
+            services.AddTransient<ILibraryService, LibraryService>();
+            
+            services.AddTransient<ICanteenService, CanteenService>();
+            
             
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             
@@ -118,7 +128,7 @@ namespace Api {
                 c.SwaggerEndpoint("../swagger/v1/swagger.json", "Tut API");
             });
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
 
             app.UseRouting();
 

@@ -2,7 +2,7 @@
 using Api.Repositories.Base;
 
 namespace Api.Services.Staff {
-    public class StaffService:IStaffService {
+    public class StaffService : IStaffService {
         private IUnitOfWork _unitOfWork;
 
         public StaffService(IUnitOfWork unitOfWork)

@@ -62,9 +62,9 @@ namespace Api.Controllers {
         // [HttpPost("Create")]
         // public async Task<IActionResult> Create([FromBody] StudentRegistrationResourceDto newStudent)
         // {
-        //     var studentToBeCreated = _mapper.Map<StudentRegistrationResourceDto, Student>(newStudent);
+        //     var studentToBeCreated = _mapper.Map<StudentRegistrationResourceDto, StudentId>(newStudent);
         //     var createdStudent = await _studentService.CreateStudent(studentToBeCreated);
-        //     var student = _mapper.Map<Student, StudentDetailResourceDto>(createdStudent);
+        //     var student = _mapper.Map<StudentId, StudentDetailResourceDto>(createdStudent);
         //     return Ok(student);
         // }
         //
@@ -74,7 +74,7 @@ namespace Api.Controllers {
         // [HttpPost("Edit/{id}")]
         // public async Task<IActionResult> Edit(int id, [FromBody] EditStudentResourceDto studentToBeUpdated)
         // {
-        //     var student = _mapper.Map<EditStudentResourceDto, Student>(studentToBeUpdated);
+        //     var student = _mapper.Map<EditStudentResourceDto, StudentId>(studentToBeUpdated);
         //     if (id == 0)
         //     {
         //         return NotFound();
@@ -104,7 +104,7 @@ namespace Api.Controllers {
         //         }
         //     }
         //
-        //     var editedStudent = _mapper.Map<Student, EditedStudentResourceDto>(student);
+        //     var editedStudent = _mapper.Map<StudentId, EditedStudentResourceDto>(student);
         //     editedStudent.Id = id;
         //     return Ok(editedStudent);
         // }
