@@ -9,5 +9,8 @@ namespace Api.Services.CanteenService {
         Task<CanteenPriceList> CreatePriceListItemAsync(CanteenPriceList item);
         Task<CanteenPriceList> UpdatePriceAsync(CanteenPriceList toUpdate);
         Task<BillStudentResourceDto> BillStudent(BillStudentResourceDto bill);
+        IEnumerable<CanteenBalance> CanteenBalances(Student studentByRefAsync);
+        public Task<double> CalculateBalance(IEnumerable<CanteenBalance> canteenBalances);
+        Task<CanteenBalance> TopUpStudentAsync(CanteenBalance canteenBalance);
     }
 }

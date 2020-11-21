@@ -47,10 +47,10 @@ namespace Api.Controllers {
         }
 
         [AllowAnonymous]
-        [HttpPost("SignUp/StudentId")]
+        [HttpPost("SignUp/Student")]
         public async Task<IActionResult> StudentSignUp(StudentSignUpResourceDto userStudentSignUpResourceDto)
         {
-            var student = await _studentService.GetStudentById(userStudentSignUpResourceDto.StudentId);
+            var student = await _studentService.GetStudentByRefAsync(userStudentSignUpResourceDto.StudentId);
             if (student != null)
             {
                 var user = _mapper.Map<StudentSignUpResourceDto, User>(userStudentSignUpResourceDto);
@@ -99,7 +99,7 @@ namespace Api.Controllers {
 
             return Problem(userCreateResult.Errors.First().Description, null, 500);
         }
-        
+
         [AllowAnonymous]
         [HttpPost("SignUp/Canteen-Help")]
         public async Task<IActionResult> CanteenHelpSignUp(StaffSignUpResourceDto userStaffSignUpResourceDto)
@@ -140,10 +140,23 @@ namespace Api.Controllers {
             if (userSigninResult)
             {
                 var roles = await _userManager.GetRolesAsync(user);
-                return Ok(new TokenResourceDto
+                var role = roles.Where(r => r.Equals("student")).SingleOrDefault();
+                Student student = null;
+                if (!string.IsNullOrEmpty(role))
+                {
+                    student = await _studentService.GetStudentByUserIdAsync(user.Id);
+                }
+
+                var tokenResourceDto = new TokenResourceDto
                 {
                     Token = GenerateJwt(user, roles)
-                });
+                };
+                if (student != null)
+                {
+                    tokenResourceDto.Student = student.Id;
+                }
+
+                return Ok(tokenResourceDto);
             }
 
             return BadRequest("Email or password incorrect.");

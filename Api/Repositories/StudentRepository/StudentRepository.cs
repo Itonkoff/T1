@@ -41,6 +41,12 @@ namespace Api.Repositories.StudentRepository {
                 );
         }
 
+        public async Task<Student> GetStudentByUserAsync(Guid userId)
+        {
+            return await DatabaseContext.Student
+                .SingleOrDefaultAsync(s => s.UserId.ToString().Equals(userId.ToString()));
+        }
+
         private DatabaseContext DatabaseContext
         {
             get { return Context as DatabaseContext; }

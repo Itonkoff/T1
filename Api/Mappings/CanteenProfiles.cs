@@ -21,6 +21,8 @@ namespace Api.Mappings {
                 .ForMember(dest => dest.Cr,
                     options =>
                         options.MapFrom(source => source.Amount));
+
+            CreateMap<StudentTopupDto, CanteenBalance>();
         }
     }
 }

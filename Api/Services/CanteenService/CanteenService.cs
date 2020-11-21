@@ -39,26 +39,33 @@ namespace Api.Services.CanteenService {
         }
 
         public async Task<BillStudentResourceDto> BillStudent(BillStudentResourceDto bill)
-        {   
+        {
             var studentByRefAsync = await _unitOfWork.Students.GetStudentByRefAsync(bill.StudentRef);
-            
+            var canteenPriceList = await _unitOfWork.CanteenPriceListRepository.GetByIdAsync(bill.Amount);
+
             var canteenBalances =
-                _unitOfWork.CanteenBalanceRepository.Find(c => c.Student == studentByRefAsync.Id);
+                CanteenBalances(studentByRefAsync);
             var calculatedBalance = await CalculateBalance(canteenBalances);
-            if (calculatedBalance - bill.Amount >= 0)
-            {                
-                var canteenBalance = _mapper.Map<BillStudentResourceDto, CanteenBalance>(bill);
+            if (calculatedBalance - Double.Parse(canteenPriceList.Price) >= 0)
+            {
+                var canteenBalance = new CanteenBalance();
                 canteenBalance.Student = studentByRefAsync.Id;
                 canteenBalance.Date = DateTime.Now;
+                canteenBalance.Dr = Double.Parse(canteenPriceList.Price);
                 await _unitOfWork.CanteenBalanceRepository.AddAsync(canteenBalance);
                 await _unitOfWork.CommitAsync();
                 return bill;
-            }            
+            }
 
             return null;
         }
 
-        private async Task<double> CalculateBalance(IEnumerable<CanteenBalance> canteenBalances)
+        public IEnumerable<CanteenBalance> CanteenBalances(Student studentByRefAsync)
+        {
+            return _unitOfWork.CanteenBalanceRepository.Find(c => c.Student == studentByRefAsync.Id);
+        }
+
+        public async Task<double> CalculateBalance(IEnumerable<CanteenBalance> canteenBalances)
         {
             double debit = 0;
             double credit = 0;
@@ -74,7 +81,16 @@ namespace Api.Services.CanteenService {
                     debit = debit + canteenBalance.Dr.Value;
             }
 
-            return debit - credit;
+            return credit - debit;
+        }
+
+        public async Task<CanteenBalance> TopUpStudentAsync(CanteenBalance canteenBalance)
+        {
+            await _unitOfWork.CanteenBalanceRepository.AddAsync(canteenBalance);
+            var commitAsync = await _unitOfWork.CommitAsync();
+            if (commitAsync > 0)
+                return canteenBalance;
+            return null;
         }
     }
 }

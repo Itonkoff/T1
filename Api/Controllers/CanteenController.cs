@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Api.Dtos;
 using Api.Models;
 using Api.Repositories.StudentRepository;
@@ -24,6 +25,17 @@ namespace Api.Controllers {
         {
             return Ok(await _canteenService.GetAllPricesAsync());
         }
+        
+        [HttpPost("Topup")]
+        public async Task<IActionResult> TopupAccount([FromBody] StudentTopupDto studentTopupDto)
+        {
+            var canteenBalance = _mapper.Map<StudentTopupDto, CanteenBalance>(studentTopupDto);
+            canteenBalance.Date = DateTime.Now;
+            var topUpStudentAsync = await _canteenService.TopUpStudentAsync(canteenBalance);
+            if (topUpStudentAsync != null)
+                return Created(string.Empty,string.Empty);
+            return BadRequest();
+        }
 
         [HttpPost("Meal")]
         public async Task<IActionResult> Meal([FromBody] MealResourceDto newMeal)
@@ -47,6 +59,6 @@ namespace Api.Controllers {
             if (billStudentResourceDto != null)
                 return Ok();
             return BadRequest("Insufficient funds");
-        }
+        }            
     }
 }
