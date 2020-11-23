@@ -70,5 +70,6 @@ namespace Api.Services.Students {
         {
             return await _unitOfWork.Students.GetStudentByUserAsync(userId);
         }
+
     }
 }

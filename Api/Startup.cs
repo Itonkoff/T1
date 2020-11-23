@@ -10,6 +10,7 @@ using Api.Repositories.Base.StaffRepository;
 using Api.Repositories.StudentRepository;
 using Api.Services.CanteenService;
 using Api.Services.LibraryService;
+using Api.Services.SchoolService;
 using Api.Services.Staff;
 using Api.Services.Students;
 using Api.Settings;
@@ -106,6 +107,8 @@ namespace Api {
             services.AddTransient<ILibraryService, LibraryService>();
             
             services.AddTransient<ICanteenService, CanteenService>();
+
+            services.AddTransient<ISchoolService, SchoolService>();
             
             
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
